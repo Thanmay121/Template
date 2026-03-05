@@ -3,7 +3,11 @@ project(Template)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Source files
+# Tell CMake to find the raylib package installed via vcpkg
+# Adding CONFIG is the key for vcpkg compatibility
+find_package(raylib CONFIG REQUIRED)
+
+# Source files (Make sure the filenames match exactly, e.g., enemyBase vs enemybase)
 add_executable(Template
     Source.cpp
     base.cpp
@@ -17,13 +21,11 @@ add_executable(Template
     collosion.hpp
 )
 
-# Find Raylib
-find_package(raylib REQUIRED)
-
-target_link_libraries(Template raylib)
+# Link the raylib library to your executable
+target_link_libraries(Template PRIVATE raylib)
 
 # Copy assets to build directory
 add_custom_command(TARGET Template POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/Warrior $<TARGET_FILE_DIR:Template>/Warrior
+    "${CMAKE_SOURCE_DIR}/Warrior" "$<TARGET_FILE_DIR:Template>/Warrior"
 )
