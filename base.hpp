@@ -5,7 +5,7 @@
 
 class base
 {
-protected:
+public:
 	Vector2 pos = { 0,0 };
 	Vector2 vel = { 0,0 };
 	Vector2 dir = { 0,0 }; // member can be max 1,min -1 (no checks)
