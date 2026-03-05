@@ -1,0 +1,21 @@
+# Visual Studio C++ project files (keep .sln, .vcxproj, .vcxproj.filters)
+*.vcxproj.user
+ipch/
+.vs/
+
+# C++ build output
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.dll
+*.exe
+*.idb
+*.aps
+
+# Raylib / output dirs
+Debug/
+Release/
+x64/
+x86/
