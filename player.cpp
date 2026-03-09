@@ -1,6 +1,7 @@
 #include "player.hpp"
 
-Player::Player(Texture2D tex, int frameCount, float animTime,Vector2 pos,float speed)
+
+Player::Player(Texture2D tex, int frameCount, float animTime,Vector2 pos,float speed,Sound s)
 {
 	this->texture = tex;
 	this->frameCount = frameCount;
@@ -8,6 +9,7 @@ Player::Player(Texture2D tex, int frameCount, float animTime,Vector2 pos,float s
 	this->state = PlayerState::IDLE;
 	this->pos = pos;
 	this->speed = speed;
+	this->s=s;
 	animPlayer.setTexture(tex, frameCount, animTime);
 }
 void Player::update()
@@ -39,11 +41,17 @@ void Player::update()
 	if (Vector2Length(dir) > 0)
 	{
 		state = PlayerState::RUNNING;
+		soundsys.playsoundinfi(s,6);
+		
 		//if not attacking and stuff that is 
 	}
 	else
 	{
 		state = PlayerState::IDLE;
+		if (IsSoundPlaying(s)) 
+    {
+        StopSound(s);
+    }
 	}
 	base::update();
 	updateState();

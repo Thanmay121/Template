@@ -19,6 +19,10 @@ add_executable(Template
     animPlayer.cpp
     animPlayer.hpp
     collosion.hpp
+    sfx.hpp
+    sfx.cpp
+    camera.hpp
+    camera.cpp
 )
 
 # Link the raylib library to your executable

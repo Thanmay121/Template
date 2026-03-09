@@ -2,6 +2,7 @@
 #include <raylib.h>
 #include <raymath.h>
 #include "animPlayer.hpp"
+#include "sfx.hpp"
 
 class base
 {
