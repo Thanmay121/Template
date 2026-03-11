@@ -1,3 +1,0 @@
-C:/Projects/C++/Raylib Projects/Template2.0/Template/build/CMakeFiles/Template.dir
-C:/Projects/C++/Raylib Projects/Template2.0/Template/build/CMakeFiles/ALL_BUILD.dir
-C:/Projects/C++/Raylib Projects/Template2.0/Template/build/CMakeFiles/ZERO_CHECK.dir
