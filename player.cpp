@@ -81,5 +81,5 @@ void Player::draw()
 	// Draw the player on the screen
 	base::draw();
 	DrawTextureRec(animPlayer.getTexture(), animPlayer.getAnimatedframe(), pos, WHITE);
-	
+	DrawRectangleLinesEx(collosionBox(dir,pos,speed,{0,0,(float)texture.height,(float)texture.width/animPlayer.getFrameCount()},0,0),2,BLUE);
 }

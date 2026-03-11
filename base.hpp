@@ -3,6 +3,7 @@
 #include <raymath.h>
 #include "animPlayer.hpp"
 #include "sfx.hpp"
+#include "collosion.hpp"
 
 class base
 {

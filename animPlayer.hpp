@@ -15,6 +15,7 @@ public:
 	void setTexture(Texture2D tex, int framecount, float animtime);
 	bool isAnimComplete();
 	Texture2D getTexture() { return this->texture; }
+	int getFrameCount(){return this->frameCount;}
 	int Hdir = 1;
 };
 

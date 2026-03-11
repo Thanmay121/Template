@@ -3,11 +3,13 @@ project(Template)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Tell CMake to find the raylib package installed via vcpkg
-# Adding CONFIG is the key for vcpkg compatibility
+# Auto-detect vcpkg toolchain via VCPKG_ROOT environment variable
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+endif()
+
 find_package(raylib CONFIG REQUIRED)
 
-# Source files (Make sure the filenames match exactly, e.g., enemyBase vs enemybase)
 add_executable(Template
     Source.cpp
     base.cpp
@@ -23,13 +25,26 @@ add_executable(Template
     sfx.cpp
     camera.hpp
     camera.cpp
+    collosion.hpp
+    collosion.cpp
 )
 
-# Link the raylib library to your executable
 target_link_libraries(Template PRIVATE raylib)
 
-# Copy assets to build directory
+if(WIN32)
+    target_link_libraries(Template PRIVATE winmm)
+endif()
+
 add_custom_command(TARGET Template POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_SOURCE_DIR}/Warrior" "$<TARGET_FILE_DIR:Template>/Warrior"
 )
+# Copy maps folder
+add_custom_command(TARGET Template POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/maps" "$<TARGET_FILE_DIR:Template>/maps")
+
+# Copy wav file
+add_custom_command(TARGET Template POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    "${CMAKE_SOURCE_DIR}/file_example_WAV_1MG.wav" "$<TARGET_FILE_DIR:Template>/file_example_WAV_1MG.wav")
