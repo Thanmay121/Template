@@ -1,3 +1,5 @@
+#build
+build/
 # Visual Studio C++ project files (keep .sln, .vcxproj, .vcxproj.filters)
 *.vcxproj.user
 ipch/

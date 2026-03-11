@@ -1,0 +1,7 @@
+# Treat all these as non-code
+*.cmake linguist-detectable=false
+*.c linguist-detectable=false
+
+# Ensure C++ is detected
+*.cpp linguist-language=C++
+*.hpp linguist-language=C++
