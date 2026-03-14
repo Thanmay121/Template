@@ -21,7 +21,7 @@ std::vector<std::vector<int>> loadcsv(const std::string& path)
     return map;
 }
 
-void drawlevel(std::vector<std::vector<int>> map,int tileSize,Texture2D tileset)
+void drawlevel(std::vector<std::vector<int>> map,int tileSize,Texture2D tileset,std::vector<Rectangle> vec)
 {
     int tilesetCols=tileset.width/tileSize;
     for (int row = 0; row < map.size(); row++) {
@@ -42,6 +42,7 @@ void drawlevel(std::vector<std::vector<int>> map,int tileSize,Texture2D tileset)
 					(float)(col * tileSize),
 					(float)(row * tileSize)
 				};
+				vec.push_back({dest.x,dest.y,src.width,src.height});
 			
 				DrawTextureRec(tileset, src, dest, WHITE);
 			}

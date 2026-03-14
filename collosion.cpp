@@ -1,22 +1,6 @@
 #include "collosion.hpp"
 
 
-Rectangle collosionBox(Vector2 direction,Vector2 pos,int speed, Rectangle collider, int offsecx,int offsety)
-{
-    collider.x= pos.x +offsecx;
-    collider.y=pos.y+offsety;//actuall center of the player
-    return collider;
-}
-
-void checkCollosion(Rectangle r1,Rectangle r2, Vector2 pos)
-{
-    if(CheckCollisionRecs(r1,r2))
-    {
-        //if collided
-        
-    }
-}
-
 /*
 	if(direction.x==0&&direction.y!=0)
 	{
@@ -29,3 +13,44 @@ void checkCollosion(Rectangle r1,Rectangle r2, Vector2 pos)
 	
 	return { pos.x+(Hdir*10*speed*GetFrameTime()) + ((texture.width / frameWidth) / 3), pos.y + (-direction.x * direction.y * 10 * speed * GetFrameTime()) + texture.height / 2, (float(texture.width) / float(frameWidth)) / 4, float(texture.height) / 5 };
 */
+Rectangle Collosion::HurtBox(Texture2D texture,int frameCount,Vector2 pos)
+{
+	int frameWidth = texture.width;
+	Rectangle rect;
+	rect.x = pos.x + ((texture.width / frameCount) / 3);
+	rect.y = pos.y + texture.height / 2;
+	rect.width = (float(texture.width) / float(frameCount)) / 3;
+	rect.height = float(texture.height) / 5;
+	hurtbox = rect;
+	return rect;
+}
+Rectangle Collosion::nxtFrameBox(Vector2 offset,float widith,float height)
+{
+	Rectangle rect=hurtbox;
+	rect.x += offset.x;
+	rect.y += offset.y;
+	rect.width = widith;
+	rect.height = height;
+	return rect;
+}
+Rectangle Collosion::GetHitBox(Vector2 offset, float widith, float height)
+{
+	Rectangle rect = hurtbox;
+	rect.x += offset.x;
+	rect.y += offset.y-25;
+	rect.width = widith;
+	rect.height = height;
+	return rect;
+}
+bool Check_Collision(Rectangle box1, std::vector<Rectangle> boxes)
+{
+	for (Rectangle& box : boxes)
+	{
+		if (CheckCollisionRecs(box1, box))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+

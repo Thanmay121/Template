@@ -6,8 +6,7 @@ enum class EnemyState
 {
 	IDLE,
 	RUNNING,
-	JUMPING,
-    LOCKON,
+	ATTACKING,
 	WANDERING,
     DEAD
 	// Add more states as needed
@@ -26,10 +25,14 @@ public:
 	Texture2D idleTexture;
 	Texture2D runningTexture;
 	float hp=100;
+	Player* playerptr;
 public:
-	enemyBase(Texture2D tex, int frameCount, float animTime, Vector2 pos, float speed,float hp);
+	Collosion Cboxes;
+	float attackcooldown = 1.0f;
+	float lastattacktime = 0.f;
+	enemyBase(Texture2D tex, int frameCount, float animTime, Vector2 pos, float speed,float hp,Player* playerptr);
 	void update() override;
 	void updateState();
 	void draw() override;
-	void lockon(Player &player);
+	void lockon();
 };

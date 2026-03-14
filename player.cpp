@@ -13,6 +13,7 @@ Player::Player(Texture2D tex, int frameCount, float animTime,Vector2 pos,float s
 	this->hp=hp;
 	animPlayer.setTexture(tex, frameCount, animTime);
 }
+
 void Player::update()
 {
 	// Update player position, velocity, and state
@@ -39,30 +40,43 @@ void Player::update()
 	else
 		dir.x = 0;
 	// state change
-	if (Vector2Length(dir) > 0)
+	if (IsKeyPressed(KEY_RIGHT_SHIFT))
 	{
-		state = PlayerState::RUNNING;
-		soundsys.playsoundinfi(s,6);
 		
-		//if not attacking and stuff that is 
+		if (attackcooldown <= GetTime() - lastattacktime)
+		{
+			lastattacktime = GetTime();
+			state = PlayerState::ATTAKING;
+		}
+		
 	}
-	else
+	if (state != PlayerState::ATTAKING)
 	{
-		state = PlayerState::IDLE;
-		if (IsSoundPlaying(s)) 
-    {
-        StopSound(s);
-    }
+		if (Vector2Length(dir) > 0)
+		{
+			state = PlayerState::RUNNING;
+			soundsys.playsoundinfi(s, 6);
+
+			//if not attacking and stuff that is 
+		}
+		else
+		{
+			state = PlayerState::IDLE;
+			if (IsSoundPlaying(s))
+			{
+				StopSound(s);
+			}
+		}
+	}
+	if (this->hp < 0)
+	{
+		state = PlayerState::CONTRACT;
 	}
 	base::update();
 	updateState();
 }
 void Player::updateState()
 {
-	if(this->hp<0)
-	{
-    //;
-	}
 	// Update the player's state based on input and conditions
 	// use animPlayer.setTexture(tex) to change the texture and anim of the player
 	switch (state)
@@ -75,9 +89,14 @@ void Player::updateState()
 	case PlayerState::RUNNING:
 		animPlayer.setTexture(runningTexture,6,1);
 		break;
-	case PlayerState::JUMPING:
+	case PlayerState::CONTRACT:
 		break;
-	case PlayerState::FALLING:
+	case PlayerState::ATTAKING:
+		animPlayer.setTexture(attackTexture, 4, .75);
+		if(animPlayer.isAnimComplete())
+		{
+			state = PlayerState::IDLE;
+		}
 		break;
 	default:
 		break;
@@ -88,5 +107,10 @@ void Player::draw()
 	// Draw the player on the screen
 	base::draw();
 	DrawTextureRec(animPlayer.getTexture(), animPlayer.getAnimatedframe(), pos, WHITE);
-	DrawRectangleLinesEx(collosionBox(dir,pos,speed,{0,0,(float)texture.height,(float)texture.width/animPlayer.getFrameCount()},0,0),2,BLUE);
+	DrawRectangleLinesEx(Cboxes.HurtBox(texture,frameCount,pos), 2, BLUE);
+	DrawRectangleLinesEx(Cboxes.nxtFrameBox(Vector2Scale(dir, 10 * speed * GetFrameTime()), (float(texture.width) / float(frameCount)) / 3, float(texture.height) / 5), 2, RED);
+	DrawText(((state==PlayerState::ATTAKING) ?"ATTACKING":"Other"), pos.x, pos.y - 20, 20, BLACK);
+	DrawText(("LastAttackTime: " + std::to_string((int)lastattacktime)).c_str(), pos.x, pos.y - 40, 20, BLACK);
+	DrawText(("HP: " + std::to_string((int)hp)).c_str(), pos.x, pos.y - 60, 20, BLACK);
+	DrawRectangleLinesEx(Cboxes.GetHitBox(Vector2Scale(dir, 10 * speed * GetFrameTime()),( float(texture.height) / 5), (float(texture.width) / float(frameCount)) / 3), 2, RED);
 }
