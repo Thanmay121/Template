@@ -26,7 +26,7 @@ void drawlevel(std::vector<std::vector<int>> map,int tileSize,Texture2D tileset)
     int tilesetCols=tileset.width/tileSize;
     for (int row = 0; row < map.size(); row++) {
 			for (int col = 0; col < map[row].size(); col++) {
-				int tileID = map[row][col] ;
+				int tileID = map[row][col];
 				if (tileID < 0) continue; // empty tile in Tiled exports as -1
 			
 				// where to cut from in the PNG
