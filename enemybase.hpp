@@ -1,18 +1,21 @@
 #pragma once
 #include "base.hpp"
+#include "player.hpp"
 
 enum class EnemyState
 {
 	IDLE,
 	RUNNING,
 	JUMPING,
-	FALLING
+    LOCKON,
+	WANDERING,
+    DEAD
 	// Add more states as needed
 };
 
 class enemyBase : public base
 {
-private:
+public:
 	// Player-specific attributes
 	EnemyState state;
 	Texture2D texture; 
@@ -22,9 +25,11 @@ private:
 	//ADD TEXTURES HERE,load these either in the constructor, or manually
 	Texture2D idleTexture;
 	Texture2D runningTexture;
+	float hp=100;
 public:
-	enemyBase(Texture2D tex, int frameCount, float animTime, Vector2 pos, float speed);
+	enemyBase(Texture2D tex, int frameCount, float animTime, Vector2 pos, float speed,float hp);
 	void update() override;
 	void updateState();
 	void draw() override;
+	void lockon(Player &player);
 };

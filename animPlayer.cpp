@@ -9,13 +9,15 @@ AnimPlayer::AnimPlayer(Texture2D tex, int framecount, float animtime)
 }
 void AnimPlayer::setTexture(Texture2D tex, int framecount, float animtime)
 {
-	this->texture = tex;
-	this->frameCount = framecount;
-	this->animTime = animtime;
-	//-----------------------
-	this->currentTime = 0;
-	this->currentFrame = 0;
-
+	if(this->texture.id != tex.id)
+	{
+		this->texture = tex;
+		this->frameCount = framecount;
+		this->animTime = animtime;
+		//-----------------------
+		this->currentTime = 0;
+		this->currentFrame = 0;
+	}
 }
 Rectangle AnimPlayer::getAnimatedframe()
 {

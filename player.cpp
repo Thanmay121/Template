@@ -1,7 +1,7 @@
 #include "player.hpp"
 
 
-Player::Player(Texture2D tex, int frameCount, float animTime,Vector2 pos,float speed,Sound s)
+Player::Player(Texture2D tex, int frameCount, float animTime,Vector2 pos,float speed,Sound s,float hp)
 {
 	this->texture = tex;
 	this->frameCount = frameCount;
@@ -10,6 +10,7 @@ Player::Player(Texture2D tex, int frameCount, float animTime,Vector2 pos,float s
 	this->pos = pos;
 	this->speed = speed;
 	this->s=s;
+	this->hp=hp;
 	animPlayer.setTexture(tex, frameCount, animTime);
 }
 void Player::update()
@@ -58,15 +59,21 @@ void Player::update()
 }
 void Player::updateState()
 {
-	
+	if(this->hp<0)
+	{
+    //;
+	}
 	// Update the player's state based on input and conditions
 	// use animPlayer.setTexture(tex) to change the texture and anim of the player
 	switch (state)
 	{
+	case PlayerState::DEAD:
+	break;
 	case PlayerState::IDLE:
-		//animPlayer.setTexture(idleTexture, frameCount, animTime);
+		animPlayer.setTexture(texture, frameCount, animTime);
 		break;
 	case PlayerState::RUNNING:
+		animPlayer.setTexture(runningTexture,6,1);
 		break;
 	case PlayerState::JUMPING:
 		break;
