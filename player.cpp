@@ -53,7 +53,15 @@ void Player::update()
 		}
 		
 	}
-	if(state!=PlayerState::ATTAKING)
+	else if(IsKeyPressed(KEY_LEFT_SHIFT))
+	{
+		if (parrycooldown <= GetTime() - lastparrytime)
+		{
+			lastparrytime = GetTime();
+			state = PlayerState::PARRY;
+		}
+	}
+	if(state!=PlayerState::ATTAKING&&state!=PlayerState::PARRY)
 	{
 		if (Vector2Length(dir) > 0&& isColliding==false)
 		{
@@ -72,12 +80,8 @@ void Player::update()
 		}
 	}
 
-	if (this->hp < 0)
-	{
-		state = PlayerState::INTASK;
-	}
 	//GETTING HIT
-	if(getHit)
+	if(getHit&&!invi)
 	{
 		if(hurtcooldown<=GetTime()-lasthurttime)
 		{
@@ -110,7 +114,14 @@ void Player::updateState()
 	case PlayerState::RUNNING:
 		animPlayer.setTexture(runningTexture,6,1);
 		break;
-	case PlayerState::INTASK:
+	case PlayerState::PARRY:
+		animPlayer.setTexture(parryTexture,6,1);
+		invi=true;
+		if(1<=GetTime()-lastparrytime)
+		{
+			state = PlayerState::IDLE;
+			invi=false;
+		}
 		break;
 	case PlayerState::ATTAKING:
 	{

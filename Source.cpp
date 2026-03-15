@@ -26,11 +26,16 @@ int main()
 	Texture2D running = LoadTexture("Warrior\\Warrior_Run.png");
 	Texture2D attack = LoadTexture("Warrior\\Warrior_Attack1.png");
 	Texture2D attack2 = LoadTexture("Warrior\\Warrior_Attack1.png");
+	Texture2D parry=LoadTexture("Warrior\\Warrior_Guard.png");
 	player.runningTexture = running;
 	player.attackTexture = attack;
 	player.attackTexture2 = attack2;
+	player.parryTexture=parry;
 	enemy.idleTexture = playerTexture;
 	enemy.runningTexture = running;
+	//---
+	ContractStatus status;
+	status=ContractStatus::NONE;
 	int j=1;
 	//-------------------------LOAD LEVEL-------------------------------------
 	auto bglvl1 = loadcsv("maps\\demo_1_bg_1.csv");
@@ -81,8 +86,7 @@ int main()
 	float lastContract=0.0f;
 	currenttask = TASKS::NONE;
 	SetWindowPosition(0, 0);
-	state=gameState::CONTRACT;
-	//
+	float switchTime=-99999.0f;
 	SetRandomSeed(int(GetTime()));
 	TASKS A = TASKS::NONE;
 	TASKS B = TASKS::NONE;
@@ -132,12 +136,18 @@ int main()
 				PHit(player,enemy);
 				EHit(player,enemy);
 				if(currenttask!=TASKS::NONE)
+				LOCKIN(currenttask,GetTime(),player,status);	
+				//-----
+				if(!timer(2,switchTime))
+				{
+					player.invi=true;
+				}
+				EndMode2D();
+				if(currenttask!=TASKS::NONE)
 				{
 					DrawText(toText(currenttask).c_str(),0,0,5,BLACK);
 				}
-				LOCKIN(currenttask);	
-				//-----
-				EndMode2D();
+				DrawText((status==ContractStatus::OFF? "OFF":status==ContractStatus::ON? "ON":"NONE"),0,10,50,BLACK);
 				EndDrawing();
 				break;
 			}
@@ -158,12 +168,15 @@ int main()
 				{
 					currenttask = A;
 					state = gameState::PlayerAlive;
+					status=ContractStatus::ON;
+					switchTime=GetTime();
 					player.pos=Vector2Add(player.pos,{100,100});//safe place
 				}
 				if(GameButton({ (float)screenWidth/2-250, (float)screenHeight/2-125, 500, 100  }, toText(B).c_str()))
 				{
 					currenttask = B;
 					state = gameState::PlayerAlive;
+					status=ContractStatus::ON;
 					player.pos=Vector2Add(player.pos,{100,100});//safe place
 				}
 				EndDrawing();
