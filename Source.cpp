@@ -24,6 +24,10 @@ int main()
 	Sound foots = LoadSound("file_example_WAV_1MG.wav");
 	Player player=Player(playerTexture, 8, 1, {200,200}, 250,bg1,100);
 	enemyBase enemy = enemyBase(playerTexture, 8, 1, {100,1000}, 150,100,player);
+	enemyBase enemy1 = enemyBase(playerTexture, 8, 1, {400,2000}, 150,100,player);
+	enemyBase enemy2 = enemyBase(playerTexture, 8, 1, {300,1500}, 150,100,player);
+	enemyBase enemy3 = enemyBase(playerTexture, 8, 1, {500,900}, 150,100,player);
+
 	Texture2D running = LoadTexture("Warrior\\Warrior_Run.png");
 	Texture2D attack = LoadTexture("Warrior\\Warrior_Attack1.png");
 	Texture2D attack2 = LoadTexture("Warrior\\Warrior_Attack1.png");
@@ -104,6 +108,9 @@ int main()
 					state = gameState::CONTRACT;
 				}
 				enemy.update();
+				enemy1.update();
+				enemy2.update();
+				enemy3.update();
 				player.update();
 				BeginDrawing();
 				if (j == 1)
@@ -145,6 +152,9 @@ int main()
 				soundsys.playsoundinfi(bg1, 6);
 
 				enemy.draw();
+				enemy1.draw();
+				enemy2.draw();
+				enemy3.draw();
 				player.draw();
 				//collosion_checks
 				if (player.state == PlayerState::RUNNING)
