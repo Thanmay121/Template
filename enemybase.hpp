@@ -42,9 +42,10 @@ public:
 	float collideCooldown=0.2f;
 	float lastCollideTime=0.0f;
 	enemyBase(Texture2D tex, int frameCount, float animTime, Vector2 pos, float speed,float hp,Player& playerptr);
+	void update(Vector2 pos);
 	void update() override;
 	void updateState();
 	void draw() override;
 	void takedmg(float dmg){this->hp-=dmg;}
-	void lockon();
+	void lockon(Vector2 pos);
 };

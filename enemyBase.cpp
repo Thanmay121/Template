@@ -20,13 +20,15 @@ enemyBase::enemyBase(Texture2D tex, int frameCount, float animTime, Vector2 pos,
 	SetRandomSeed(int(GetTime()));
 }
 void enemyBase::update()
+{}
+void enemyBase::update(Vector2 pos)
 {
 	if(state==EnemyState::ATTACKING)
 	{
 		dir={0,0};
 	}
 	else
-	lockon();
+	lockon(pos);
 	
 	base::update();	
 	// Update player position, velocity, and state
@@ -91,9 +93,9 @@ void enemyBase::draw()
 	DrawText(TextFormat("Player pos: %.0f, %.0f", playerptr.pos.x, playerptr.pos.y), pos.x, pos.y - 20, 20, GREEN);
 
 }
-void enemyBase::lockon()
+void enemyBase::lockon(Vector2 pos)
 {
-	Vector2 dir = Vector2Subtract(playerptr.pos, this->pos);
+	Vector2 dir = Vector2Subtract(pos, this->pos);
 	float distance = Vector2Length(dir);
 	if (distance > 0.0f && distance < 350.0f)
 	{

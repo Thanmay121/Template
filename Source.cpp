@@ -47,10 +47,12 @@ void spawnEnemies(Texture2D Tex,Player *player)
 }
 void enemyRender(Player &player)
 {
+	player.isColliding = false;
 	for(enemyBase& enemy : enemies)
 	{
 		enemy.draw();
-		enemy.update();
+		enemy.update(player.pos);
+		enemy.isColliding=false;
 		E2P(player,enemy);
 		P2E(player,enemy);
 		PHit(player,enemy);
@@ -178,7 +180,6 @@ int main()
 				drawlevel(castle, 32, tilecastle, ground);
 				drawlevel(towers, 32, tiletower, ground);
 				
-
 				player.draw();
 				//collosion_checks
 				enemyRender(player);
