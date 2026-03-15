@@ -6,7 +6,7 @@ enum class PlayerState
 	IDLE,
 	RUNNING,
 	ATTAKING,
-	INTASK,
+	PARRY,
 	DEAD
 	// Add more states as needed
 };
@@ -30,8 +30,14 @@ public:
 	Texture2D attackTexture2;
 	Texture2D runningTexture;
 	Texture2D texture;
+	Texture2D parryTexture;
 	bool Attackdone=false;
 	int frameCount = 0;
+	//Parry
+	float parrycooldown=0.5f;
+	float lastparrytime=0.f;
+	//
+	bool invi=false;
 	Collosion Cboxes=Collosion(pos,dir,animPlayer.getWidth(),animPlayer.getTexture().height,{30,30});
 	float hp = 100;
 	Color tint=WHITE;

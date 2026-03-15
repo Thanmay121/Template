@@ -14,7 +14,21 @@ enum class  TASKS
     DEALDMG=1,
 	NODMG=2
 };
+enum class ContractStatus
+{
+    ON,
+    OFF,
+    NONE
+};
+enum class BUFFS
+{
+    NONE=0,
 
+};
+bool timer(float x, float start)
+{
+    return GetTime() - start >= x;
+}
 bool GameButton(Rectangle bounds, const char* text)
 {
     Vector2 mouse = GetMousePosition();
@@ -53,18 +67,50 @@ std::string toText(TASKS t)
         break; 
     }
 }
-void LOCKIN(TASKS t)
+int dmg=0;
+void LOCKIN(TASKS t,float time,Player &player,ContractStatus &status)
 {
     switch (t)
     {
     case TASKS::DEALDMG:
-        /* code */
+    {
+      /*  if(!timer(30,time))
+        {
+            if(player.state==PlayerState::ATTAKING)
+            {
+                dmg+=player.attackStrength;
+                if(dmg>=500)
+                {
+                    status=ContractStatus::ON;
+                }
+            }
+        }
+        */
+        if(dmg>=500)
+        {
+            status=ContractStatus::ON;
+        }
+        else
+        status=ContractStatus::OFF;
         break;
+    }
     case TASKS::NODMG:
+        if(!timer(30,time))
+        {
+            if(player.hp==100)
+            {
+                status=ContractStatus::ON;
+            }
+            else
+            {
+                status=ContractStatus::OFF;
+            }
+        }
         break;
 
     default:
         break;
     }
 }
+
 

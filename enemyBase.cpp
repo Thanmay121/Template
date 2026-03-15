@@ -21,7 +21,7 @@ enemyBase::enemyBase(Texture2D tex, int frameCount, float animTime, Vector2 pos,
 }
 void enemyBase::update()
 {
-	lockon();
+	//lockon();
 	base::update();	
 	// Update player position, velocity, and state
 
