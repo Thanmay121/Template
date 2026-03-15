@@ -20,8 +20,9 @@ int main()
 	InitAudioDevice();
 	SetTargetFPS(60);  
 	Texture2D playerTexture = LoadTexture("Warrior\\Warrior_Idle.png");
-	Sound bg1 = LoadSound("file_example_WAV_1MG.wav");
-	Player player=Player(playerTexture, 8, 1, {0,0}, 250,bg1,100);
+	Sound bg1 = LoadSound("649132__sonically_sound__medievalfantasy-rpg-loop-mix-at-32-secs-to-extendrepeat.wav");
+	Sound foots = LoadSound("file_example_WAV_1MG.wav");
+	Player player=Player(playerTexture, 8, 1, {200,200}, 250,bg1,100);
 	enemyBase enemy = enemyBase(playerTexture, 8, 1, {100,1000}, 150,100,player);
 	Texture2D running = LoadTexture("Warrior\\Warrior_Run.png");
 	Texture2D attack = LoadTexture("Warrior\\Warrior_Attack1.png");
@@ -49,6 +50,7 @@ int main()
 	auto house2 = loadcsv("maps\\demo_1_house2.csv");
 	auto towers = loadcsv("maps\\demo_1_towers.csv");
 	auto water = loadcsv("maps\\demo_1_water.csv");
+	auto waterfoam = loadcsv("maps\\demo_1_water_foam.csv");
 	Texture2D archery = LoadTexture("maps\\Archery.png");
 	Texture2D archery2 = LoadTexture("maps\\Archery2.png");
 	Texture2D Barracks = LoadTexture("maps\\Barracks.png");
@@ -75,6 +77,7 @@ int main()
 	Texture2D tree4 = LoadTexture("maps\\Tree4.png");
 	Texture2D bush = LoadTexture("maps\\Bushe1.png");
 	Texture2D watertile = LoadTexture("maps\\Water_Background_color.png");
+	Texture2D waterfoamtile = LoadTexture("maps\\Water_Foam.png");
 	
 	//--------------------FIXING WINDOW------------------------------------
 	int monitor = GetCurrentMonitor();
@@ -109,28 +112,45 @@ int main()
 					j++;
 				}
 				ClearBackground(RAYWHITE);
-				//camera.target.x = Clamp(camera.target.x, 852.3f, 2100.0f);
-				//camera.target.y = Clamp(camera.target.y, 460.2f, 2550.1f);
+				camera.target.x = Clamp(camera.target.x, 887.3f, 2350.0f);
+				camera.target.y = Clamp(camera.target.y, 520.2f, 2800.1f);
 				BeginMode2D(camera);
 				DrawRectangle(400, 250, 30, 20, YELLOW);
 				camsys.lockOnEntity(camera, player);
 				// tilemap rendering
-				drawlevel(water, 32, watertile, ground);
+				//drawlevel(water, 32, watertile, ground);
+				//drawlevel(bglvl1, 32, forest2, level);
+				//drawlevel(bg2, 32, forest1, ground);
+				//drawlevel(bg3, 32, tree3, level);
+				//drawlevel(bg4, 32, tree4, level);
+				//drawlevel(bg5, 32, bush, level);
+				//drawlevel(house, 32, tilehouse, ground);
+				//drawlevel(house2, 32, tilehouse2, ground);
+				//drawlevel(monastry, 32, tileMonastery, ground);
+				//drawlevel(castle, 32, tilecastle, ground);
+				//drawlevel(towers, 32, tiletower, ground);
+				drawlevel(water,32,watertile,ground);
+				drawlevel(waterfoam, 32, waterfoamtile,ground);
+				drawlevel(bg2, 32, forest1, ground);
 				drawlevel(bglvl1, 32, forest2, level);
-				drawlevel(bg2, 32, forest1, level);
 				drawlevel(bg3, 32, tree3, level);
+				drawlevel(monastry, 32, tileMonastery, ground);
+				drawlevel(house2, 32, tilehouse2, ground);
+				drawlevel(house, 32, tilehouse, ground);
 				drawlevel(bg4, 32, tree4, level);
 				drawlevel(bg5, 32, bush, level);
-				drawlevel(house, 32, tilehouse, ground);
-				drawlevel(house2, 32, tilehouse2, ground);
-				drawlevel(monastry, 32, tileMonastery, ground);
 				drawlevel(castle, 32, tilecastle, ground);
 				drawlevel(towers, 32, tiletower, ground);
-				
+				SOUND soundsys;
+				soundsys.playsoundinfi(bg1, 6);
 
 				enemy.draw();
 				player.draw();
 				//collosion_checks
+				if (player.state == PlayerState::RUNNING)
+				{
+					soundsys.playsoundinfi(foots,6);
+				}
 				E2P(player,enemy);
 				P2E(player,enemy);
 				PHit(player,enemy);

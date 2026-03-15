@@ -66,17 +66,12 @@ void Player::update()
 		if (Vector2Length(dir) > 0&& isColliding==false)
 		{
 			state = PlayerState::RUNNING;
-			soundsys.playsoundinfi(s, 6);
 			base::update();
 			//if not attacking and stuff that is 
 		}
 		else
 		{
 			state = PlayerState::IDLE;
-			if (IsSoundPlaying(s))
-			{
-				StopSound(s);
-			}
 		}
 	}
 
