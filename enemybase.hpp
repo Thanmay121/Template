@@ -36,7 +36,7 @@ public:
 	float attackStrength=10;
 	float attackcooldown = 1.0f;
 	float lastattacktime = 0.f;
-	float collideCooldown=0.2f;
+	float collideCooldown=0.175f;
 	float lastCollideTime=0.0f;
 	enemyBase(Texture2D tex, int frameCount, float animTime, Vector2 pos, float speed,float hp,Player& playerptr);
 	void update() override;

@@ -33,9 +33,43 @@ int main()
 	enemy.runningTexture = running;
 	int j=1;
 	//-------------------------LOAD LEVEL-------------------------------------
-	auto map = loadcsv("maps\\testtilemap.csv");
-	auto solids = loadcsv("maps\\testtilemap_walls_walls.csv");
-	Texture2D tileset = LoadTexture("maps\\Tilemap_color1.png");
+	auto bglvl1 = loadcsv("maps\\demo_1_bg_1.csv");
+	auto bg2 = loadcsv("maps\\demo_1_bg_2.csv");
+	auto bg3 = loadcsv("maps\\demo_1_bg_3.csv");
+	auto bg4 = loadcsv("maps\\demo_1_bg_4.csv");
+	auto bg5 = loadcsv("maps\\demo_1_bg_5.csv");
+	auto castle = loadcsv("maps\\demo_1_castle.csv");
+	auto house = loadcsv("maps\\demo_1_house.csv");
+	auto monastry = loadcsv("maps\\demo_1_monastry.csv");
+	auto house2 = loadcsv("maps\\demo_1_house2.csv");
+	auto towers = loadcsv("maps\\demo_1_towers.csv");
+	auto water = loadcsv("maps\\demo_1_water.csv");
+	Texture2D archery = LoadTexture("maps\\Archery.png");
+	Texture2D archery2 = LoadTexture("maps\\Archery2.png");
+	Texture2D Barracks = LoadTexture("maps\\Barracks.png");
+	Texture2D Barracks2 = LoadTexture("maps\\Barracks2.png");
+	Texture2D tilecastle= LoadTexture("maps\\Castle.png");
+	Texture2D tilecastle2 = LoadTexture("maps\\Castle2.png");
+	Texture2D tilehouse = LoadTexture("maps\\House1.png");
+	Texture2D tilehouse2 = LoadTexture("maps\\House2.png");
+	Texture2D tileHouse3 = LoadTexture("maps\\House3.png");
+	Texture2D tileHouse12 = LoadTexture("maps\\House12.png");
+	Texture2D tileHouse22 = LoadTexture("maps\\House22.png");
+	Texture2D tileHouse32 = LoadTexture("maps\\House32.png");
+	Texture2D tileMonastery = LoadTexture("maps\\Monastery.png");
+	Texture2D tileShadow = LoadTexture("maps\\Shadow.png");
+	Texture2D forest1 = LoadTexture("maps\\Tilemap_color1.png");
+	Texture2D forest2 = LoadTexture("maps\\Tilemap_color2.png");
+	Texture2D forest3 = LoadTexture("maps\\Tilemap_color3.png");
+	Texture2D forest4 = LoadTexture("maps\\Tilemap_color4.png");
+	Texture2D forest5 = LoadTexture("maps\\Tilemap_color5.png");
+	Texture2D tiletower = LoadTexture("maps\\Tower.png");
+	Texture2D tree1 = LoadTexture("maps\\Tree1.png");
+	Texture2D tree2 = LoadTexture("maps\\Tree2.png");
+	Texture2D tree3 = LoadTexture("maps\\Tree3.png");
+	Texture2D tree4 = LoadTexture("maps\\Tree4.png");
+	Texture2D bush = LoadTexture("maps\\Bushe1.png");
+	Texture2D watertile = LoadTexture("maps\\Water_Background_color.png");
 	
 	//--------------------FIXING WINDOW------------------------------------
 	int monitor = GetCurrentMonitor();
@@ -71,12 +105,25 @@ int main()
 					j++;
 				}
 				ClearBackground(RAYWHITE);
+				//camera.target.x = Clamp(camera.target.x, 852.3f, 2100.0f);
+				//camera.target.y = Clamp(camera.target.y, 460.2f, 2550.1f);
 				BeginMode2D(camera);
 				DrawRectangle(400, 250, 30, 20, YELLOW);
 				camsys.lockOnEntity(camera, player);
 				// tilemap rendering
-				drawlevel(map, 32, tileset, level);
-				drawlevel(solids, 32, tileset, ground);
+				drawlevel(water, 32, watertile, ground);
+				drawlevel(bglvl1, 32, forest2, level);
+				drawlevel(bg2, 32, forest1, level);
+				drawlevel(bg3, 32, tree3, level);
+				drawlevel(bg4, 32, tree4, level);
+				drawlevel(bg5, 32, bush, level);
+				drawlevel(house, 32, tilehouse, ground);
+				drawlevel(house2, 32, tilehouse2, ground);
+				drawlevel(monastry, 32, tileMonastery, ground);
+				drawlevel(castle, 32, tilecastle, ground);
+				drawlevel(towers, 32, tiletower, ground);
+				
+
 				enemy.draw();
 				player.draw();
 				//collosion_checks

@@ -140,6 +140,6 @@ void Player::draw()
 	DrawRectangleLinesEx(Cboxes.hurtbox,2,BLUE);
 	DrawRectangleLinesEx(Cboxes.nxtFrameBox,2,GREEN);
 	DrawRectangleLinesEx(Cboxes.hitbox,2,YELLOW);
-	DrawText(TextFormat("HP: %.0f /100", hp), pos.x,pos.y, 20, RED);
+	DrawText(TextFormat("%f  %f", pos.x, pos.y), pos.x, pos.y, 20, RED);
 	//DrawText(TextFormat("%.0f, %.0f", mouse.x, mouse.y), mouse.x + 10, mouse.y, 20, BLACK);
 }
