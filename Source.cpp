@@ -84,13 +84,13 @@ int main()
 				P2E(player,enemy);
 				PHit(player,enemy);
 				EHit(player,enemy);
+				LOCKIN(currenttask);	
+				//-----
+				EndMode2D();
 				if(currenttask!=TASKS::NONE)
 				{
 					DrawText(toText(currenttask).c_str(),0,0,5,BLACK);
 				}
-				LOCKIN(currenttask);	
-				//-----
-				EndMode2D();
 				EndDrawing();
 				break;
 			}

@@ -49,8 +49,8 @@ std::string toText(TASKS t)
         return("TAKE NO DMG FOR 30sec");
         break;
     default:
-        return "sad";
-        break;
+        return "NONE";
+        break; 
     }
 }
 void LOCKIN(TASKS t)
