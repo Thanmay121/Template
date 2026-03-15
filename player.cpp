@@ -12,6 +12,7 @@ Player::Player(Texture2D tex, int frameCount, float animTime,Vector2 pos,float s
 	this->s=s;
 	this->hp=hp;
 	animPlayer.setTexture(tex, frameCount, animTime);
+	SetRandomSeed(int(GetTime()));
 }
 
 void Player::update()
@@ -20,10 +21,12 @@ void Player::update()
 	if (IsKeyDown(KEY_W))
 	{
 		dir.y = -1;
+		animPlayer.Hdir = -1;
 	}
 	else if (IsKeyDown(KEY_S))
 	{
 		dir.y = 1;
+		animPlayer.Hdir = 1;
 	}
 	else
 		dir.y = 0;
@@ -50,13 +53,13 @@ void Player::update()
 		}
 		
 	}
-	if (state != PlayerState::ATTAKING)
+	if(state!=PlayerState::ATTAKING)
 	{
-		if (Vector2Length(dir) > 0)
+		if (Vector2Length(dir) > 0&& isColliding==false)
 		{
 			state = PlayerState::RUNNING;
 			soundsys.playsoundinfi(s, 6);
-
+			base::update();
 			//if not attacking and stuff that is 
 		}
 		else
@@ -68,12 +71,30 @@ void Player::update()
 			}
 		}
 	}
+
 	if (this->hp < 0)
 	{
-		state = PlayerState::CONTRACT;
+		state = PlayerState::INTASK;
 	}
-	base::update();
+	//GETTING HIT
+	if(getHit)
+	{
+		if(hurtcooldown<=GetTime()-lasthurttime)
+		{
+			takedmg(dmgObtained);
+			lasthurttime=GetTime();
+		}
+	}
+	if (.2f>=GetTime() - lasthurttime)  
+    {
+        tint = RED;
+    }
+    else
+    {
+        tint = WHITE;
+    }
 	updateState();
+	Cboxes.Update(pos,dir,animPlayer.getWidth(),animPlayer.getTexture().height,animPlayer.Hdir);
 }
 void Player::updateState()
 {
@@ -89,15 +110,24 @@ void Player::updateState()
 	case PlayerState::RUNNING:
 		animPlayer.setTexture(runningTexture,6,1);
 		break;
-	case PlayerState::CONTRACT:
+	case PlayerState::INTASK:
 		break;
 	case PlayerState::ATTAKING:
-		animPlayer.setTexture(attackTexture, 4, .75);
-		if(animPlayer.isAnimComplete())
+	{
+		if (animPlayer.getTexture().id != attackTexture.id && animPlayer.getTexture().id != attackTexture2.id)
+		{
+			int rand=GetRandomValue(0,1);
+			if(rand==1)
+			animPlayer.setTexture(attackTexture,4,0.75);
+			else
+			animPlayer.setTexture(attackTexture2,4,0.75);
+		}
+		if(0.75<=GetTime()-lastattacktime)
 		{
 			state = PlayerState::IDLE;
 		}
 		break;
+	}
 	default:
 		break;
 	}
@@ -106,11 +136,10 @@ void Player::draw()
 {
 	// Draw the player on the screen
 	base::draw();
-	DrawTextureRec(animPlayer.getTexture(), animPlayer.getAnimatedframe(), pos, WHITE);
-	DrawRectangleLinesEx(Cboxes.HurtBox(texture,frameCount,pos), 2, BLUE);
-	DrawRectangleLinesEx(Cboxes.nxtFrameBox(Vector2Scale(dir, 10 * speed * GetFrameTime()), (float(texture.width) / float(frameCount)) / 3, float(texture.height) / 5), 2, RED);
-	DrawText(((state==PlayerState::ATTAKING) ?"ATTACKING":"Other"), pos.x, pos.y - 20, 20, BLACK);
-	DrawText(("LastAttackTime: " + std::to_string((int)lastattacktime)).c_str(), pos.x, pos.y - 40, 20, BLACK);
-	DrawText(("HP: " + std::to_string((int)hp)).c_str(), pos.x, pos.y - 60, 20, BLACK);
-	DrawRectangleLinesEx(Cboxes.GetHitBox(Vector2Scale(dir, 10 * speed * GetFrameTime()),( float(texture.height) / 5), (float(texture.width) / float(frameCount)) / 3), 2, RED);
+	DrawTextureRec(animPlayer.getTexture(), animPlayer.getAnimatedframe(), pos, tint);
+	DrawRectangleLinesEx(Cboxes.hurtbox,2,BLUE);
+	DrawRectangleLinesEx(Cboxes.nxtFrameBox,2,GREEN);
+	DrawRectangleLinesEx(Cboxes.hitbox,2,YELLOW);
+	DrawText(TextFormat("HP: %.0f /100", hp), pos.x,pos.y, 20, RED);
+	//DrawText(TextFormat("%.0f, %.0f", mouse.x, mouse.y), mouse.x + 10, mouse.y, 20, BLACK);
 }

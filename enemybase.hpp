@@ -8,31 +8,40 @@ enum class EnemyState
 	RUNNING,
 	ATTACKING,
 	WANDERING,
+	HURT,
     DEAD
 	// Add more states as needed
 };
 
 class enemyBase : public base
 {
-public:
+private:
 	// Player-specific attributes
-	EnemyState state;
 	Texture2D texture; 
 	int frameCount = 0;
 	float animTime = 0;
-	AnimPlayer animPlayer = AnimPlayer(texture, frameCount, animTime);
-	//ADD TEXTURES HERE,load these either in the constructor, or manually
+	AnimPlayer animPlayer;
+	Player& playerptr;
+public:
+	bool isColliding=false;
+	EnemyState state;
+	Collosion Cboxes;
 	Texture2D idleTexture;
 	Texture2D runningTexture;
+	bool getHit=false;
+	Color tint=WHITE;
+	float hurtcooldown = 1.0f;
+	float lasthurttime = 0.f;
 	float hp=100;
-	Player* playerptr;
-public:
-	Collosion Cboxes;
+	float attackStrength=10;
 	float attackcooldown = 1.0f;
 	float lastattacktime = 0.f;
-	enemyBase(Texture2D tex, int frameCount, float animTime, Vector2 pos, float speed,float hp,Player* playerptr);
+	float collideCooldown=0.2f;
+	float lastCollideTime=0.0f;
+	enemyBase(Texture2D tex, int frameCount, float animTime, Vector2 pos, float speed,float hp,Player& playerptr);
 	void update() override;
 	void updateState();
 	void draw() override;
+	void takedmg(float dmg){this->hp-=dmg;}
 	void lockon();
 };

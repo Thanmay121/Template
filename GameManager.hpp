@@ -1,10 +1,18 @@
 #include "player.hpp"
 #include "enemyBase.hpp"
+#include <string>
 
-enum gameState
+enum class gameState
 {
 	PlayerAlive,
+    TRANSITIONING,
 	CONTRACT
+};
+enum class  TASKS
+{
+	NONE=0,
+    DEALDMG=1,
+	NODMG=2
 };
 
 bool GameButton(Rectangle bounds, const char* text)
@@ -28,5 +36,35 @@ bool GameButton(Rectangle bounds, const char* text)
         fontSize, WHITE);
 
     return clicked;
+}
+
+std::string toText(TASKS t)
+{
+    switch (t)
+    {
+    case TASKS::DEALDMG:
+        return("Deal 5K DMG IN 60sec");
+        break;
+    case TASKS::NODMG:
+        return("TAKE NO DMG FOR 30sec");
+        break;
+    default:
+        return "sad";
+        break;
+    }
+}
+void LOCKIN(TASKS t)
+{
+    switch (t)
+    {
+    case TASKS::DEALDMG:
+        /* code */
+        break;
+    case TASKS::NODMG:
+        break;
+
+    default:
+        break;
+    }
 }
 

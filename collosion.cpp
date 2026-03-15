@@ -1,4 +1,6 @@
 #include "collosion.hpp"
+#include "player.hpp"
+#include "enemybase.hpp"
 
 
 /*
@@ -13,44 +15,105 @@
 	
 	return { pos.x+(Hdir*10*speed*GetFrameTime()) + ((texture.width / frameWidth) / 3), pos.y + (-direction.x * direction.y * 10 * speed * GetFrameTime()) + texture.height / 2, (float(texture.width) / float(frameWidth)) / 4, float(texture.height) / 5 };
 */
-Rectangle Collosion::HurtBox(Texture2D texture,int frameCount,Vector2 pos)
+Collosion::Collosion(Vector2 pos,Vector2 dir,float FrameWidth,float height,Vector2 offset)
 {
-	int frameWidth = texture.width;
-	Rectangle rect;
-	rect.x = pos.x + ((texture.width / frameCount) / 3);
-	rect.y = pos.y + texture.height / 2;
-	rect.width = (float(texture.width) / float(frameCount)) / 3;
-	rect.height = float(texture.height) / 5;
-	hurtbox = rect;
-	return rect;
+	this->pos=pos;
+	this->FrameWidth=FrameWidth;
+	this->height=height;
+	this->offset=offset;
+	this->dir=dir;
 }
-Rectangle Collosion::nxtFrameBox(Vector2 offset,float widith,float height)
+void Collosion::Update(Vector2 pos,Vector2 dir,float FrameWidth,float height,int Hdir)
+{
+	this->pos=pos;
+	this->FrameWidth=FrameWidth;
+	this->height=height;
+	this->dir=dir;
+	this->Hdir=Hdir;
+	HurtBox();
+	NxtFrameBox();
+	HitBox();
+}
+void Collosion::HurtBox()
+{
+	Rectangle rect;
+	rect.x = pos.x + ((FrameWidth) / 3);
+	rect.y = pos.y + height / 2;
+	rect.width = FrameWidth /3;
+	rect.height = float(height) / 5;
+	this->hurtbox = rect;
+}
+void Collosion::NxtFrameBox()
 {
 	Rectangle rect=hurtbox;
-	rect.x += offset.x;
-	rect.y += offset.y;
-	rect.width = widith;
-	rect.height = height;
-	return rect;
+	rect.x += offset.x*dir.x;
+	rect.y += offset.y*dir.y;
+	this->nxtFrameBox=rect;
 }
-Rectangle Collosion::GetHitBox(Vector2 offset, float widith, float height)
+void Collosion::HitBox()
 {
-	Rectangle rect = hurtbox;
-	rect.x += offset.x;
-	rect.y += offset.y-25;
-	rect.width = widith;
-	rect.height = height;
-	return rect;
+	Rectangle rightrec= { pos.x + ((FrameWidth) / 1.5f),pos.y + (height / 4), (height) / 5 , ((FrameWidth) / 2) };
+	Rectangle leftrec= { pos.x + ((FrameWidth) / 7),pos.y + (height / 4), float(height) / 5 , (FrameWidth / 2) };
+	Rectangle bottomrec = { pos.x + ((FrameWidth) / 4),pos.y + (height / 1.5), (FrameWidth / 2) , (height) / 5 };
+    if (dir.y > 0)
+        this->hitbox = bottomrec;
+    else if (Hdir < 0)
+        this->hitbox = leftrec;
+    else
+        this->hitbox = rightrec;
 }
-bool Check_Collision(Rectangle box1, std::vector<Rectangle> boxes)
+
+
+void E2P(Player &player,enemyBase &enemy)
 {
-	for (Rectangle& box : boxes)
+	if(CheckCollisionRecs(player.Cboxes.nxtFrameBox , enemy.Cboxes.hurtbox))
 	{
-		if (CheckCollisionRecs(box1, box))
-		{
-			return true;
-		}
+		player.isColliding=true;
+		//enemy shd be able to hit here 
 	}
-	return false;
+	else 
+	player.isColliding=false;
+}
+void P2E(Player &player,enemyBase &enemy)
+{
+	if(CheckCollisionRecs(enemy.Cboxes.nxtFrameBox , player.Cboxes.hurtbox))
+	{
+		if(enemy.collideCooldown<=GetTime()-enemy.lastCollideTime)
+		{
+			enemy.isColliding=true;
+			enemy.lastCollideTime=GetTime();
+		}
+		//enemy shd be able to hit here 
+	}
+	else 
+	{
+		
+		enemy.isColliding=false;
+	}
+}
+void PHit(Player &player,enemyBase &enemy)
+{
+	if(CheckCollisionRecs(player.Cboxes.hitbox, enemy.Cboxes.hurtbox))
+	{
+		if(player.state==PlayerState::ATTAKING)
+		enemy.getHit=true;
+		else
+		enemy.getHit=false;
+	}
+	else
+	enemy.getHit=false;
+}
+void EHit(Player &player,enemyBase &enemy)
+{
+	if(CheckCollisionRecs(enemy.Cboxes.hitbox, player.Cboxes.hurtbox))
+	{
+		enemy.state=EnemyState::ATTACKING;
+		player.getHit=true;
+		player.dmgObtained=enemy.attackStrength;
+	}
+	else
+	{
+		player.getHit=false;
+	}
 }
 
