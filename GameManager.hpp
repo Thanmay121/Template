@@ -2,6 +2,8 @@
 #include "enemyBase.hpp"
 #include <string>
 
+
+int WaveNo=0;
 enum class gameState
 {
 	PlayerAlive,
@@ -12,7 +14,9 @@ enum class  TASKS
 {
 	NONE=0,
     DEALDMG=1,
-	NODMG=2
+	NODMG=2,
+    PARRYATTACKS=3,
+    STAYREGION=4
 };
 enum class ContractStatus
 {
@@ -20,11 +24,7 @@ enum class ContractStatus
     OFF,
     NONE
 };
-enum class BUFFS
-{
-    NONE=0,
 
-};
 bool timer(float x, float start)
 {
     return GetTime() - start >= x;
@@ -67,25 +67,28 @@ std::string toText(TASKS t)
         break; 
     }
 }
-int dmg=0;
-void LOCKIN(TASKS t,float time,Player &player,ContractStatus &status)
+void LOCKIN(TASKS t,float time,Player &player,std::vector<enemyBase> enemy,ContractStatus &status,int &dmg)
 {
     switch (t)
     {
     case TASKS::DEALDMG:
     {
-      /*  if(!timer(30,time))
+        if(!timer(30,time))
         {
             if(player.state==PlayerState::ATTAKING)
             {
-                dmg+=player.attackStrength;
-                if(dmg>=500)
+                for(enemyBase &e:enemy)
                 {
-                    status=ContractStatus::ON;
+                    if(e.dmgtaken)
+                    dmg+=player.attackStrength;
+                    if(dmg>=500)
+                    {
+                        status=ContractStatus::ON;
+                    }
                 }
+
             }
         }
-        */
         if(dmg>=500)
         {
             status=ContractStatus::ON;

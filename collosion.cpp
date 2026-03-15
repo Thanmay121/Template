@@ -112,7 +112,7 @@ void EHit(Player &player,enemyBase &enemy)
 		player.dmgObtained=enemy.attackStrength;
 	}
 	else
-	{
+	{	
 		player.getHit=false;
 	}
 }

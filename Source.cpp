@@ -6,12 +6,64 @@
 #include "maps.hpp"
 #include "enemyBase.hpp"
 #include "GameManager.hpp"
+
+std::vector<enemyBase> enemies;
+void EnemyRenderBeginPlay()
+{
+	for (enemyBase& enemy : enemies)
+	{
+		enemy.idleTexture =  LoadTexture("Warrior\\Warrior_Idle.png");;
+		enemy.runningTexture =  LoadTexture("Warrior\\Warrior_Run.png");
+		enemy.attackTexture=LoadTexture("Warrior\\Warrior_Attack1.png");
+
+	}
+}
+void spawnEnemies(Texture2D Tex,Player *player)
+{
+
+	for (int i = enemies.size()-1; i >= 0; i--)
+	{
+		if (!enemies[i].ALIVE)
+		{
+			enemies.erase(enemies.begin() + i);
+		}
+		
+	}
+	if (enemies.empty())
+	{
+		WaveNo++;
+		for (int i = 0; i < 2*WaveNo; i++)
+		{
+
+			float randX=rand()%GetScreenWidth();
+			float randY=rand()%GetScreenHeight();
+			enemies.emplace_back(Tex,8,1, Vector2{ randX,randY }, 150.0f,100,*player);
+
+		}
+		EnemyRenderBeginPlay();
+	}
+
+
+}
+void enemyRender(Player &player)
+{
+	for(enemyBase& enemy : enemies)
+	{
+		enemy.draw();
+		enemy.update();
+		E2P(player,enemy);
+		P2E(player,enemy);
+		PHit(player,enemy);
+		EHit(player,enemy);
+	}
+}
 int main()
 {
 
 	gameState state = gameState::PlayerAlive;
 	std::vector<Rectangle> level;
 	std::vector<Rectangle> ground;
+	
 	CAMERA camsys;
 	Camera2D camera = {0};
 	int screenWidth = 1600;
@@ -22,7 +74,6 @@ int main()
 	Texture2D playerTexture = LoadTexture("Warrior\\Warrior_Idle.png");
 	Sound bg1 = LoadSound("file_example_WAV_1MG.wav");
 	Player player=Player(playerTexture, 8, 1, {0,0}, 250,bg1,100);
-	enemyBase enemy = enemyBase(playerTexture, 8, 1, {100,1000}, 150,100,player);
 	Texture2D running = LoadTexture("Warrior\\Warrior_Run.png");
 	Texture2D attack = LoadTexture("Warrior\\Warrior_Attack1.png");
 	Texture2D attack2 = LoadTexture("Warrior\\Warrior_Attack1.png");
@@ -31,8 +82,7 @@ int main()
 	player.attackTexture = attack;
 	player.attackTexture2 = attack2;
 	player.parryTexture=parry;
-	enemy.idleTexture = playerTexture;
-	enemy.runningTexture = running;
+
 	//---
 	ContractStatus status;
 	status=ContractStatus::NONE;
@@ -86,21 +136,22 @@ int main()
 	float lastContract=0.0f;
 	currenttask = TASKS::NONE;
 	SetWindowPosition(0, 0);
-	float switchTime=-99999.0f;
 	SetRandomSeed(int(GetTime()));
 	TASKS A = TASKS::NONE;
 	TASKS B = TASKS::NONE;
+	int dmg=0;
+	player.hp=10;
 	while (!WindowShouldClose())
 	{
 		switch (state)
 		{
 			case gameState::PlayerAlive:
 			{
+				spawnEnemies(playerTexture,&player);
 				if (player.hp <= 0)
 				{
 					state = gameState::CONTRACT;
 				}
-				enemy.update();
 				player.update();
 				BeginDrawing();
 				if (j == 1)
@@ -109,8 +160,8 @@ int main()
 					j++;
 				}
 				ClearBackground(RAYWHITE);
-				//camera.target.x = Clamp(camera.target.x, 852.3f, 2100.0f);
-				//camera.target.y = Clamp(camera.target.y, 460.2f, 2550.1f);
+				camera.target.x = Clamp(camera.target.x, 852.3f, 2100.0f);
+				camera.target.y = Clamp(camera.target.y, 460.2f, 2550.1f);
 				BeginMode2D(camera);
 				DrawRectangle(400, 250, 30, 20, YELLOW);
 				camsys.lockOnEntity(camera, player);
@@ -128,26 +179,19 @@ int main()
 				drawlevel(towers, 32, tiletower, ground);
 				
 
-				enemy.draw();
 				player.draw();
 				//collosion_checks
-				E2P(player,enemy);
-				P2E(player,enemy);
-				PHit(player,enemy);
-				EHit(player,enemy);
+				enemyRender(player);
 				if(currenttask!=TASKS::NONE)
-				LOCKIN(currenttask,GetTime(),player,status);	
+				LOCKIN(currenttask,GetTime(),player,enemies,status,dmg);	
 				//-----
-				if(!timer(2,switchTime))
-				{
-					player.invi=true;
-				}
 				EndMode2D();
 				if(currenttask!=TASKS::NONE)
 				{
 					DrawText(toText(currenttask).c_str(),0,0,5,BLACK);
 				}
 				DrawText((status==ContractStatus::OFF? "OFF":status==ContractStatus::ON? "ON":"NONE"),0,10,50,BLACK);
+				DrawText(TextFormat("%d", dmg), 0, 70, 40, BLACK);
 				EndDrawing();
 				break;
 			}
@@ -169,7 +213,6 @@ int main()
 					currenttask = A;
 					state = gameState::PlayerAlive;
 					status=ContractStatus::ON;
-					switchTime=GetTime();
 					player.pos=Vector2Add(player.pos,{100,100});//safe place
 				}
 				if(GameButton({ (float)screenWidth/2-250, (float)screenHeight/2-125, 500, 100  }, toText(B).c_str()))

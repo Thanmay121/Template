@@ -21,7 +21,13 @@ enemyBase::enemyBase(Texture2D tex, int frameCount, float animTime, Vector2 pos,
 }
 void enemyBase::update()
 {
-	//lockon();
+	if(state==EnemyState::ATTACKING)
+	{
+		dir={0,0};
+	}
+	else
+	lockon();
+	
 	base::update();	
 	// Update player position, velocity, and state
 
@@ -62,7 +68,14 @@ void enemyBase::updateState()
 		animPlayer.setTexture(runningTexture, 6, 1);
 		break;
 	case EnemyState::ATTACKING:
-		break;
+	{
+		animPlayer.setTexture(attackTexture,4,0.75);
+		if(0.75<=GetTime()-lastattacktime)
+		{
+			state = EnemyState::IDLE;
+			break;
+		}
+	}
 	}
 }
 void enemyBase::draw()
@@ -75,6 +88,7 @@ void enemyBase::draw()
 	DrawRectangleLinesEx(Cboxes.nxtFrameBox,2,GREEN);
 	DrawRectangleLinesEx(Cboxes.hitbox,2,RED);
 	DrawText(TextFormat("HP: %.0f /100", hp), pos.x,pos.y, 20, RED);
+	DrawText(TextFormat("Player pos: %.0f, %.0f", playerptr.pos.x, playerptr.pos.y), pos.x, pos.y - 20, 20, GREEN);
 
 }
 void enemyBase::lockon()
@@ -100,6 +114,7 @@ void enemyBase::lockon()
 	else
 	{
 		this->state = EnemyState::IDLE;
+		this->dir={0,0};
 	}
 
 }
