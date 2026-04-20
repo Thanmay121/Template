@@ -24,16 +24,19 @@ private:
 	Player& playerptr;
 public:
 	bool isColliding=false;
+	bool alive=true;
 	EnemyState state;
 	Collosion Cboxes;
 	Texture2D idleTexture;
 	Texture2D runningTexture;
+	Texture2D attackTexture;
+	bool hitTaken=false;
 	bool getHit=false;
 	Color tint=WHITE;
 	float hurtcooldown = 1.0f;
 	float lasthurttime = 0.f;
 	float hp=100;
-	float attackStrength=10;
+	float attackStrength=50;
 	float attackcooldown = 1.0f;
 	float lastattacktime = 0.f;
 	float collideCooldown=0.175f;

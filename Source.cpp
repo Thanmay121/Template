@@ -6,6 +6,7 @@
 #include "maps.hpp"
 #include "enemyBase.hpp"
 #include "GameManager.hpp"
+#include "gameover.hpp"
 int main()
 {
 
@@ -27,7 +28,10 @@ int main()
 	enemyBase enemy1 = enemyBase(playerTexture, 8, 1, {400,2000}, 150,100,player);
 	enemyBase enemy2 = enemyBase(playerTexture, 8, 1, {300,1500}, 150,100,player);
 	enemyBase enemy3 = enemyBase(playerTexture, 8, 1, {500,900}, 150,100,player);
-
+	const Vector2 enemySpawn = {100, 1000};
+	const Vector2 enemy1Spawn = {400, 2000};
+	const Vector2 enemy2Spawn = {300, 1500};
+	const Vector2 enemy3Spawn = {500, 900};
 	Texture2D running = LoadTexture("Warrior\\Warrior_Run.png");
 	Texture2D attack = LoadTexture("Warrior\\Warrior_Attack1.png");
 	Texture2D attack2 = LoadTexture("Warrior\\Warrior_Attack1.png");
@@ -38,6 +42,14 @@ int main()
 	player.parryTexture=parry;
 	enemy.idleTexture = playerTexture;
 	enemy.runningTexture = running;
+	enemy2.runningTexture = running;
+	enemy1.runningTexture = running;
+	enemy3.runningTexture = running;
+	enemy. attackTexture = attack;
+	enemy2.attackTexture = attack;
+	enemy1.attackTexture = attack;
+	enemy3.attackTexture = attack;
+
 	//---
 	ContractStatus status;
 	status=ContractStatus::NONE;
@@ -97,6 +109,11 @@ int main()
 	SetRandomSeed(int(GetTime()));
 	TASKS A = TASKS::NONE;
 	TASKS B = TASKS::NONE;
+	std::vector<enemyBase> vec;
+	vec.push_back(enemy1);
+	vec.push_back(enemy2);
+	vec.push_back(enemy);
+	vec.push_back(enemy3);	
 	while (!WindowShouldClose())
 	{
 		switch (state)
@@ -105,7 +122,21 @@ int main()
 			{
 				if (player.hp <= 0)
 				{
+					player.getHit = false;
+					player.invi = true;
 					state = gameState::CONTRACT;
+					break;
+				}
+
+				if(!timer(2,switchTime))
+				{
+					player.invi=true;
+					player.getHit=false;
+				}
+				else
+				{
+					if(player.state != PlayerState::PARRY)
+					player.invi=false;
 				}
 				enemy.update();
 				enemy1.update();
@@ -161,34 +192,135 @@ int main()
 				{
 					soundsys.playsoundinfi(foots,6);
 				}
-				E2P(player,enemy);
-				P2E(player,enemy);
-				PHit(player,enemy);
-				EHit(player,enemy);
-				if(currenttask!=TASKS::NONE)
-				LOCKIN(currenttask,GetTime(),player,status);	
-				//-----
-				if(!timer(2,switchTime))
+				if(enemy.alive)
 				{
-					player.invi=true;
+					E2P(player,enemy);
+					P2E(player,enemy);
+					PHit(player,enemy);
+					EHit(player,enemy);
+				}
+				if(enemy1.alive)
+				{
+				E2P(player,enemy1);
+				P2E(player,enemy1);
+				PHit(player,enemy1);
+				EHit(player,enemy1);
+				}
+				
+				if(enemy2.alive)
+				{
+				E2P(player,enemy2);
+				P2E(player,enemy2);
+				PHit(player,enemy2);
+				EHit(player,enemy2);
+				}
+				if(enemy3.alive)
+				{
+				E2P(player,enemy3);
+				P2E(player,enemy3);
+				PHit(player,enemy3);
+				EHit(player,enemy3);
+				}
+				if(currenttask!=TASKS::NONE)
+				{
+					for(enemyBase& enemy:vec)
+					{
+						LOCKIN(currenttask,switchTime,player,status,enemy);	
+					}
+				}
+				if (status == ContractStatus::FAILED)
+				{
+					state = gameState::GAME_OVER;
+					break;
 				}
 				EndMode2D();
 				if(currenttask!=TASKS::NONE)
 				{
-					DrawText(toText(currenttask).c_str(),0,0,5,BLACK);
+					DrawText(toText(currenttask).c_str(),0,0,30,BLACK);
+					//DrawText(TextFormat("DMG", dmg),0, 40, 30, RED);
 				}
-				DrawText((status==ContractStatus::OFF? "OFF":status==ContractStatus::ON? "ON":"NONE"),0,10,50,BLACK);
+				DrawText((status==ContractStatus::FAILED? "FAILED":status==ContractStatus::ON? "ON":"NONE"),0,10,50,BLACK);
+				EndDrawing();
+				break;
+			}
+
+			case gameState::GAME_OVER:
+			{
+				BeginDrawing();
+				ClearBackground(BLACK);
+
+				GameOverAction action = DrawGameOverScreen(screenWidth, screenHeight);
+				if (action == GameOverAction::RETRY)
+				{
+					player.hp = 100;
+					player.pos = {200, 200};
+					player.state = PlayerState::IDLE;
+					player.invi = false;
+					player.getHit = false;
+					status = ContractStatus::NONE;
+					currenttask = TASKS::NONE;
+					switchTime = GetTime();
+					enemy.pos = enemySpawn;
+					enemy.hp = 100;
+					enemy.alive = true;
+					enemy.state = EnemyState::IDLE;
+					enemy.getHit = false;
+					enemy.hitTaken = false;
+					enemy.isColliding = false;
+					enemy.tint = WHITE;
+
+					enemy1.pos = enemy1Spawn;
+					enemy1.hp = 100;
+					enemy1.alive = true;
+					enemy1.state = EnemyState::IDLE;
+					enemy1.getHit = false;
+					enemy1.hitTaken = false;
+					enemy1.isColliding = false;
+					enemy1.tint = WHITE;
+
+					enemy2.pos = enemy2Spawn;
+					enemy2.hp = 100;
+					enemy2.alive = true;
+					enemy2.state = EnemyState::IDLE;
+					enemy2.getHit = false;
+					enemy2.hitTaken = false;
+					enemy2.isColliding = false;
+					enemy2.tint = WHITE;
+
+					enemy3.pos = enemy3Spawn;
+					enemy3.hp = 100;
+					enemy3.alive = true;
+					enemy3.state = EnemyState::IDLE;
+					enemy3.getHit = false;
+					enemy3.hitTaken = false;
+					enemy3.isColliding = false;
+					enemy3.tint = WHITE;
+
+					vec.clear();
+					vec.push_back(enemy1);
+					vec.push_back(enemy2);
+					vec.push_back(enemy);
+					vec.push_back(enemy3);
+					state = gameState::PlayerAlive;
+				}
+				else if (action == GameOverAction::QUIT)
+				{
+					CloseWindow();
+				}
+
 				EndDrawing();
 				break;
 			}
 		
 			case gameState::CONTRACT:
 			{
+				player.invi = true;
+				player.getHit = false;
 				if(player.hp<=0)
 				{
 					A=(TASKS)GetRandomValue(1,1);
 					B=(TASKS)GetRandomValue(2,2);
-					player.hp=110;
+					player.hp=100;
 				}
 				//contract state stuff
 				BeginDrawing();
@@ -198,15 +330,28 @@ int main()
 				{
 					currenttask = A;
 					state = gameState::PlayerAlive;
-					status=ContractStatus::ON;
+					status=ContractStatus::NONE;
 					switchTime=GetTime();
+					player.getHit = false;
+					player.invi = true;
+					if (currenttask == TASKS::NODMG)
+					{
+						player.hp = 100;
+					}
 					player.pos=Vector2Add(player.pos,{100,100});//safe place
 				}
 				if(GameButton({ (float)screenWidth/2-250, (float)screenHeight/2-125, 500, 100  }, toText(B).c_str()))
 				{
 					currenttask = B;
 					state = gameState::PlayerAlive;
-					status=ContractStatus::ON;
+					switchTime=GetTime();
+					status=ContractStatus::NONE;
+					player.getHit = false;
+					player.invi = true;
+					if (currenttask == TASKS::NODMG)
+					{
+						player.hp = 100;
+					}
 					player.pos=Vector2Add(player.pos,{100,100});//safe place
 				}
 				EndDrawing();

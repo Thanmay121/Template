@@ -27,6 +27,8 @@ add_executable(Template
     camera.cpp
     collosion.hpp
     collosion.cpp
+    gameover.hpp
+    gameover.cpp
 )
 
 target_link_libraries(Template PRIVATE raylib)

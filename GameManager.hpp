@@ -1,3 +1,4 @@
+#pragma once
 #include "player.hpp"
 #include "enemyBase.hpp"
 #include <string>
@@ -6,7 +7,8 @@ enum class gameState
 {
 	PlayerAlive,
     TRANSITIONING,
-	CONTRACT
+    CONTRACT,
+    GAME_OVER
 };
 enum class  TASKS
 {
@@ -18,7 +20,8 @@ enum class ContractStatus
 {
     ON,
     OFF,
-    NONE
+    NONE,
+    FAILED
 };
 enum class BUFFS
 {
@@ -57,56 +60,83 @@ std::string toText(TASKS t)
     switch (t)
     {
     case TASKS::DEALDMG:
-        return("Deal 5K DMG IN 60sec");
+        return("Deal 500 DMG in 60 seconds");
         break;
     case TASKS::NODMG:
-        return("TAKE NO DMG FOR 30sec");
+        return("TAKE NO DMG for 30 seconds");
         break;
     default:
         return "NONE";
         break; 
     }
 }
+bool buffapplied=false;
 int dmg=0;
-void LOCKIN(TASKS t,float time,Player &player,ContractStatus &status)
+TASKS activeTask = TASKS::NONE;
+float hpAtTaskStart = 0.0f;
+void LOCKIN(TASKS t,float time,Player &player,ContractStatus &status,enemyBase &enemy)
 {
+    if (t == TASKS::NONE)
+    {
+        activeTask = TASKS::NONE;
+        dmg = 0;
+        buffapplied = false;
+        status = ContractStatus::NONE;
+        return;
+    }
+    else if (t != activeTask)   
+    {
+        activeTask = t;
+        dmg = 0;
+        hpAtTaskStart = player.hp;
+        buffapplied = false;
+        status = ContractStatus::ON;
+    }
+
     switch (t)
     {
     case TASKS::DEALDMG:
     {
-      /*  if(!timer(30,time))
+        const float duration = 60.0f;
+        if (!timer(duration, time))
         {
-            if(player.state==PlayerState::ATTAKING)
+            if (player.state == PlayerState::ATTAKING && enemy.hitTaken)
             {
-                dmg+=player.attackStrength;
-                if(dmg>=500)
-                {
-                    status=ContractStatus::ON;
-                }
+                dmg += static_cast<int>(player.attackStrength);
             }
-        }
-        */
-        if(dmg>=500)
-        {
-            status=ContractStatus::ON;
+
+            status = (dmg >= 500) ? ContractStatus::ON : ContractStatus::ON;
         }
         else
-        status=ContractStatus::OFF;
+        {
+            status = (dmg >= 500) ? ContractStatus::NONE : ContractStatus::FAILED;
+            if(status == ContractStatus::NONE && buffapplied==false)
+            {
+                player.attackStrength *= 1.2f;
+                buffapplied=true;
+            }
+        }
         break;
     }
     case TASKS::NODMG:
-        if(!timer(30,time))
-        {
-            if(player.hp==100)
+            if (player.hp < hpAtTaskStart)
             {
-                status=ContractStatus::ON;
+                status = ContractStatus::FAILED;
+            }
+            else if (timer(30.0f, time))
+            {
+                status = ContractStatus::NONE;
+                if(buffapplied==false)
+                {
+                    player.hp *= 1.2f;
+                    buffapplied=true;
+                }
             }
             else
             {
-                status=ContractStatus::OFF;
+                status = ContractStatus::ON;
             }
-        }
-        break;
+            break;
 
     default:
         break;
