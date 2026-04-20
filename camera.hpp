@@ -4,8 +4,8 @@
 class CAMERA
 {
 	public:
-	float camx = 725;
-	float camy= 350;
+	float camx = 840;
+	float camy= 450;
 	int i =0;
 	void defaultcam(Camera2D &camera,Player &entity);
 	void lockOnEntity(Camera2D &camera,Player &entity);

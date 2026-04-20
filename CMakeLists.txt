@@ -27,6 +27,8 @@ add_executable(Template
     camera.cpp
     collosion.hpp
     collosion.cpp
+    gameover.hpp
+    gameover.cpp
 )
 
 target_link_libraries(Template PRIVATE raylib)
@@ -43,8 +45,3 @@ add_custom_command(TARGET Template POST_BUILD
 add_custom_command(TARGET Template POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_SOURCE_DIR}/maps" "$<TARGET_FILE_DIR:Template>/maps")
-
-# Copy wav file
-add_custom_command(TARGET Template POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    "${CMAKE_SOURCE_DIR}/file_example_WAV_1MG.wav" "$<TARGET_FILE_DIR:Template>/file_example_WAV_1MG.wav")

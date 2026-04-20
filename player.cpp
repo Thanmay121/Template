@@ -1,7 +1,7 @@
 #include "player.hpp"
 
 
-Player::Player(Texture2D tex, int frameCount, float animTime,Vector2 pos,float speed,Sound s)
+Player::Player(Texture2D tex, int frameCount, float animTime,Vector2 pos,float speed,Sound s,float hp)
 {
 	this->texture = tex;
 	this->frameCount = frameCount;
@@ -10,18 +10,23 @@ Player::Player(Texture2D tex, int frameCount, float animTime,Vector2 pos,float s
 	this->pos = pos;
 	this->speed = speed;
 	this->s=s;
+	this->hp=hp;
 	animPlayer.setTexture(tex, frameCount, animTime);
+	SetRandomSeed(int(GetTime()));
 }
+
 void Player::update()
 {
 	// Update player position, velocity, and state
 	if (IsKeyDown(KEY_W))
 	{
 		dir.y = -1;
+		animPlayer.Hdir = -1;
 	}
 	else if (IsKeyDown(KEY_S))
 	{
 		dir.y = 1;
+		animPlayer.Hdir = 1;
 	}
 	else
 		dir.y = 0;
@@ -38,40 +43,97 @@ void Player::update()
 	else
 		dir.x = 0;
 	// state change
-	if (Vector2Length(dir) > 0)
+	if (IsKeyPressed(KEY_RIGHT_SHIFT))
 	{
-		state = PlayerState::RUNNING;
-		soundsys.playsoundinfi(s,6);
 		
-		//if not attacking and stuff that is 
+		if (attackcooldown <= GetTime() - lastattacktime)
+		{
+			lastattacktime = GetTime();
+			state = PlayerState::ATTAKING;
+		}
+		
 	}
-	else
+	else if(IsKeyPressed(KEY_LEFT_SHIFT))
 	{
-		state = PlayerState::IDLE;
-		if (IsSoundPlaying(s)) 
-    {
-        StopSound(s);
-    }
+		if (parrycooldown <= GetTime() - lastparrytime)
+		{
+			lastparrytime = GetTime();
+			state = PlayerState::PARRY;
+		}
 	}
-	base::update();
+	if(state!=PlayerState::ATTAKING&&state!=PlayerState::PARRY)
+	{
+		if (Vector2Length(dir) > 0&& isColliding==false)
+		{
+			state = PlayerState::RUNNING;
+			base::update();
+			//if not attacking and stuff that is 
+		}
+		else
+		{
+			state = PlayerState::IDLE;
+		}
+	}
+
+	//GETTING HIT
+	if(getHit&&!invi)
+	{
+		if(hurtcooldown<=GetTime()-lasthurttime)
+		{
+			takedmg(dmgObtained);
+			lasthurttime=GetTime();
+		}
+	}
+	if (.2f>=GetTime() - lasthurttime)  
+    {
+        tint = RED;
+    }
+    else
+    {
+        tint = WHITE;
+    }
 	updateState();
+	Cboxes.Update(pos,dir,animPlayer.getWidth(),animPlayer.getTexture().height,animPlayer.Hdir);
 }
 void Player::updateState()
 {
-	
 	// Update the player's state based on input and conditions
 	// use animPlayer.setTexture(tex) to change the texture and anim of the player
 	switch (state)
 	{
+	case PlayerState::DEAD:
+	break;
 	case PlayerState::IDLE:
-		//animPlayer.setTexture(idleTexture, frameCount, animTime);
+		animPlayer.setTexture(texture, frameCount, animTime);
 		break;
 	case PlayerState::RUNNING:
+		animPlayer.setTexture(runningTexture,6,1);
 		break;
-	case PlayerState::JUMPING:
+	case PlayerState::PARRY:
+		animPlayer.setTexture(parryTexture,6,1);
+		invi=true;
+		if(1<=GetTime()-lastparrytime)
+		{
+			state = PlayerState::IDLE;
+			invi=false;
+		}
 		break;
-	case PlayerState::FALLING:
+	case PlayerState::ATTAKING:
+	{
+		if (animPlayer.getTexture().id != attackTexture.id && animPlayer.getTexture().id != attackTexture2.id)
+		{
+			int rand=GetRandomValue(0,1);
+			if(rand==1)
+			animPlayer.setTexture(attackTexture,4,0.75);
+			else
+			animPlayer.setTexture(attackTexture2,4,0.75);
+		}
+		if(0.75<=GetTime()-lastattacktime)
+		{
+			state = PlayerState::IDLE;
+		}
 		break;
+	}
 	default:
 		break;
 	}
@@ -80,6 +142,10 @@ void Player::draw()
 {
 	// Draw the player on the screen
 	base::draw();
-	DrawTextureRec(animPlayer.getTexture(), animPlayer.getAnimatedframe(), pos, WHITE);
-	DrawRectangleLinesEx(collosionBox(dir,pos,speed,{0,0,(float)texture.height,(float)texture.width/animPlayer.getFrameCount()},0,0),2,BLUE);
+	DrawTextureRec(animPlayer.getTexture(), animPlayer.getAnimatedframe(), pos, tint);
+	//DrawRectangleLinesEx(Cboxes.hurtbox,2,BLUE);
+	//DrawRectangleLinesEx(Cboxes.nxtFrameBox,2,GREEN);
+	//DrawRectangleLinesEx(Cboxes.hitbox,2,YELLOW);
+	DrawText(TextFormat("HP: %.0f/100", hp), pos.x+75, pos.y, 20, RED);
+	//DrawText(TextFormat("%.0f, %.0f", mouse.x, mouse.y), mouse.x + 10, mouse.y, 20, BLACK);
 }
